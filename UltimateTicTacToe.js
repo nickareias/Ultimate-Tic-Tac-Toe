@@ -1,9 +1,10 @@
 //Global variables for whether or not each player is human or AI
-var player1IsHuman = (prompt("Is player1 human? (Yes/No)", "yes").toLowerCase() === "yes")?true:false;
-var player2IsHuman = (prompt("Is player2 human? (Yes/No)", "no").toLowerCase() === "yes")?true:false;
+var player1IsHuman = true//(prompt("Is player1 human? (Yes/No)", "yes").toLowerCase() === "yes")?true:false;
+var player2IsHuman = false//(prompt("Is player2 human? (Yes/No)", "no").toLowerCase() === "yes")?true:false;
 
 //Get AI Difficulty Mode
-var difficulty = 0;
+var difficulty = 3;
+/*
 if (!player1IsHuman || !player2IsHuman) {
     while (difficulty === 0) {
         var answer = prompt("Select AI difficulty. (E)asy (M)edium (H)ard ", 'E').toLowerCase();
@@ -20,7 +21,7 @@ if (!player1IsHuman || !player2IsHuman) {
         }
     }
 }
-
+*/
 //Global variables for keeping track of game state
 var selected; //Keeps track of which spaces have already been selected
 var wonCells; //Keeps track of which cells have been won or tied (1 or 2 for player 1 or 2, 0 for still playing, -1 for tie)
@@ -291,7 +292,7 @@ function markCellForPlayer(outerX, outerY, innerX, innerY, player)
 			for(var j = 0; j < 3; j++)
 				wonCellsString += ("["+ i + "]" + "[" + j + "]" + ": " + wonCells[i][j] + "\n"); 
 		
-		alert(wonCellsString);
+		//alert(wonCellsString);
 		
 		
         //Check for a game win
