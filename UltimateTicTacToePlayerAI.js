@@ -54,6 +54,7 @@ function calculateAIPlayer2Move(outerX, outerY, innerX, innerY) {
             break;
         case 3:
             //hard
+			return calculateMove(outerX, outerY, innerX, innerY, 6, 2);
             break;
     }
 
@@ -249,7 +250,8 @@ function countPointsBigBoard(numberCount, player, opponent) {
 function evaluateBoardState(player)
 {
 	//this will be 1 or -1 depending on which player the board is being evaluated for
-	var modifier = (player === 1) ? 1: -1;
+	//var modifier = (player === 1) ? 1: -1;
+	var modifier = 1;
 
 	//points that will be passed up to the min-max function
 	var points = 0;
@@ -729,8 +731,9 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
         innerX: -1,
         innerY: -1
     };
-
 	
+	var debugging = 0;
+
 	//change evaluation based on if ply is even or odd.
 	//if its even the AI will be checking player's perspective
 	//if its odd the AI will be checking its own perspective on the board state
@@ -761,11 +764,11 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 		var wonCellsString = "";
 		for(var i = 0; i < 3; i++)
 			for(var j = 0; j < 3; j++)
-				wonCellsString += ("["+ i + "]" + "[" + j + "]" + ": " + wonCells[i][j] + "\n"); 
+				wonCellsString += ("["+ i + "]" + "[" + j + "]" + ": " + wonCells[i][j] + "\n");
 		
-		alert(wonCellsString);
+		//alert(wonCellsString);
 		*/
-		alert(state.value);
+		//alert(state.value);
         
 		return state;
     }
@@ -791,7 +794,7 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 							wonCells[i][j] = checkForBoardWin(i, j, player);
                             mark(i, j, k, l, player, 0.7);
 							
-							//CODE THAT WORKS
+							//Old code
 							/*
 							//calculate next move normally
 							var newState = calculateMove(i, j, k, l, plyCount - 1, (player === 1) ? 2 : 1);
@@ -801,41 +804,47 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 							newState.innerY = l;
 							*/
 							
-							//SHITTY CODE
+						
 							//if this move resulted in a win or draw, stop branching and evaluate here
 							if(checkForGameWin(player) != 0)
 							{
-								alert("Board state winnable by player: "+ player);
+								alert("board state winnable by player: " + player);
+						
+								var newState = {
+									value: -1,
+									outerX: i,
+									outerY: j,
+									innerX: k,
+									innerY: l
+								};
 					
-								state.value = evaluateBoardState((player === 1) ? 2 : 1);
-		
-								alert(state.value);
+					
+								var tempPlayer = player;
+								var tempPlyCount = plyCount;
+					
+								while(tempPlyCount > 0)
+								{
+									tempPlyCount--;
+									tempPlayer = ((tempPlayer === 1) ? 2 : 1);
+								}
+					
+								//newState.value = evaluateBoardState((player === 1) ? 2 : 1);
+								newState.value = evaluateBoardState(tempPlayer);
+								
+								
+								alert("Board state winnable by player: "+ player + "\nvalue = " + newState.value);
+						
 		
 								//alert(state.value);
+		
+								//alert(state.value);
+								
+								debugging = 1;
+								
 								selected[i][j][k][l] = 0;
 								wonCells[i][j] = 0;
 								mark(i, j, k, l, player, 0);
 								
-								state.innerX = k;
-								state.innerY = l;
-								
-								//return state;
-								/*
-								//stop branching and evaluate the state here by calculating move with plyCount = 0
-								while(plyCount > 0)
-								{
-									plyCount--;
-									player = ((player === 1) ? 2 : 1);
-								}
-																
-								var newState = calculateMove(i, j, k, l, 0, (player === 1) ? 2 : 1);
-								newState.outerX = i;
-								newState.outerY = j;
-								newState.innerX = k;
-								newState.innerY = l;
-								
-								
-								*/
 							}
 							else
 							{
@@ -891,35 +900,38 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 					
                     if(checkForGameWin(player) != 0)
 					{
-						alert("Board state winnable by player: "+ player);
+						
+						alert("board state winnable by player: " + player);
 						//stop branching and evaluate the state here by calculating move with plyCount = 0
 					
-						state.value = evaluateBoardState((player === 1) ? 2 : 1);
-		
-						alert(state.value);
-						selected[innerX][innerY][i][j] = 0;
-						wonCells[i][j] = 0;
-						mark(innerX, innerY, i, j, player, 0);
-						
-						state.innerX = i;
-						state.innerY = j;
-						
-						//return state;
-
-						/*
-						while(plyCount > 0)
+						var newState = {
+							value: -1,
+							outerX: innerX,
+							outerY: innerY,
+							innerX: i,
+							innerY: j
+						};
+			
+						var tempPlayer = player;
+						var tempPlyCount = plyCount;
+			
+						while(tempPlyCount > 0)
 						{
-							plyCount--;
-							player = ((player === 1) ? 2 : 1);
+							tempPlyCount--;
+							tempPlayer = ((tempPlayer === 1) ? 2 : 1);
 						}
 						
-						var newState = calculateMove(innerX, innerY, i, j, 0, player);
-						newState.outerX = innerX;
-						newState.outerY = innerY;
-						newState.innerX = i;
-						newState.innerY = j;
+						//newState.value = evaluateBoardState((player === 1) ? 2 : 1);
+						newState.value = evaluateBoardState(tempPlayer);
+
+						alert("Board state winnable by player: "+ player + "\nvalue = " + newState.value);
 						
-						*/
+						debugging = 1;
+						
+						selected[innerX][innerY][i][j] = 0;
+						wonCells[innerX][innerY] = 0;
+						mark(innerX, innerY, i, j, player, 0);
+						
 					}
 					else
 					{
@@ -930,8 +942,6 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 						newState.innerY = j;
 					}
 
-					
-					
                     //based on level in tree, get min or max
                     if (plyCount % 2 === 1)
                         state = getMax(state, newState);
@@ -940,7 +950,7 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 
                     // reset position
                     selected[innerX][innerY][i][j] = 0;
-					wonCells[outerX][outerY] = 0;
+					wonCells[innerX][innerY] = 0;
                     mark(innerX, innerY, i, j, player, 0);
 				}
             }
