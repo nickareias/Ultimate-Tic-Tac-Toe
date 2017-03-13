@@ -1,27 +1,20 @@
-//Global variables for whether or not each player is human or AI
-var player1IsHuman = true//(prompt("Is player1 human? (Yes/No)", "yes").toLowerCase() === "yes")?true:false;
-var player2IsHuman = false//(prompt("Is player2 human? (Yes/No)", "no").toLowerCase() === "yes")?true:false;
-
-//Get AI Difficulty Mode
-var difficulty = 3;
-/*
-if (!player1IsHuman || !player2IsHuman) {
-    while (difficulty === 0) {
-        var answer = prompt("Select AI difficulty. (E)asy (M)edium (H)ard ", 'E').toLowerCase();
-        switch (answer) {
-            case 'e':
-                difficulty = 1;
-                break;
-            case 'm':
-                difficulty = 2;
-                break;
-            case 'h':
-                difficulty = 3;
-                break;
-        }
-    }
-}
+/* Ultimate Tic Tac Toe
+* This file controlls the game rules and graphics
+* Most of the core game code was writte by someone else
+* But the AI code was all done by me, from scratch.
+*
+* In the markCellForPlayer() function.  The call to calculateAIPlayer1Move
+* Is the link to my AI code.
 */
+
+
+//Global variables for whether or not each player is human or AI
+var player1IsHuman = true //(prompt("Is player1 human? (Yes/No)", "yes").toLowerCase() === "yes")?true:false;
+var player2IsHuman = false //(prompt("Is player2 human? (Yes/No)", "no").toLowerCase() === "yes")?true:false;
+
+//AI Difficulty Mode (1 = easy) (2 = medium) (3 = hard)
+var difficulty = 3;
+
 //Global variables for keeping track of game state
 var selected; //Keeps track of which spaces have already been selected
 var wonCells; //Keeps track of which cells have been won or tied (1 or 2 for player 1 or 2, 0 for still playing, -1 for tie)

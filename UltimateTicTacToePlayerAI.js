@@ -1,10 +1,14 @@
-//FOR REFERENCE
-//Global variables for keeping track of game state
-//var selected; //Keeps track of which spaces have already been selected
-//var wonCells; //Keeps track of which cells have been won or tied (1 or 2 for player 1 or 2, 0 for still playing, -1 for tie)
-
-//var player1Move = calculateAIPlayer1Move(outerX, outerY, innerX, innerY);
-//var player2Move = calculateAIPlayer2Move(outerX, outerY, innerX, innerY);
+/* Ultimate Tic Tac Toe AI
+*
+*  This is the code that will calculate the computer's move	
+*  It uses game theory and a constrained depth first search
+*  to find the best move.  It also uses alpha beta pruning
+*  to avoid searching branches that do not have the best move.
+*  The depth that the algorithm searches is determined by the
+*  ply variable of the calculateMove() function.  The higher
+*  the ply, the longer the algorithm will take, and 
+*  the more moves it can look ahead.
+*/
 
 var totalPly = 2;
 
@@ -63,194 +67,22 @@ function calculateAIPlayer2Move(outerX, outerY, innerX, innerY) {
     return aiMove;
 }
 
-// iterate over wonCells[] similar to evalState
-function evalGame(player) {
-    var opponent = (player === 1) ? 2 : 1;
+/*Evaluates the state of the game.
 
-    //numWinnableRows + numBlockedWins + (numWins*10)
-    var evalValue = 0;
-    var numberCount;
+will return a point value based on the player who is at the end of the sequence of moves
+points are added up if grid states have favourable attributes that are in a row
 
-    //iterate through rows
-    numberCount = [0, 0, 0];
-    for (var i = 0; i < 3; i++)
-        for (var j = 0; j < 3; j++)
-            //  count number of 0s players and opponents in row
-            numberCount[wonCells[i][j]]++;
-    evalValue += countPointsBigBoard(numberCount, player, opponent);
+different board states are valued positively and negatively with different weights
+	2-in a rows
+	winnable rows
+	blocked rows
 
-    //iterate through columns
-    numberCount = [0, 0, 0];
-    for (var i = 0; i < 3; i++)
-        for (var j = 0; j < 3; j++)
-            //  count number of 0s players and opponents in row
-            numberCount[wonCells[j][i]]++;
-    evalValue += countPointsBigBoard(numberCount, player, opponent);
-
-    //check diagonal 1
-    numberCount = [0, 0, 0];
-    for (var i = 0; i < 3; i++) {
-        //iterate through elements in diagonal
-        numberCount[wonCells[i][i]]++;
-    }
-    evalValue += countPointsBigBoard(numberCount, player, opponent);
-
-    //check diagonal 2
-    numberCount = [0, 0, 0];
-    for (var i = 0; i < 3; i++) {
-        //iterate through elements in diagonal
-        numberCount[wonCells[2 - i][i]]++;
-    }
-    evalValue += countPointsBigBoard(numberCount, player, opponent);
-    //prompt("Eval big game: " + evalValue);
-    return evalValue;
-}
-
-function evalState(outerX, outerY, player) {
-    //prompt("evaluating");
-    var opponent = (player === 1) ? 2 : 1;
-
-    //numWinnableRows + numBlockedWins + (numWins*10)
-    var evalValue = 0;
-    var numberCount;
-
-    //iterate through rows
-    for (var i = 0; i < 3; i++) {
-        numberCount = [0, 0, 0];
-        // iterate through elements in row
-        for (var j = 0; j < 3; j++) {
-            //  count number of 0s players and opponents in row
-            numberCount[selected[outerX][outerY][i][j]]++;
-        }
-        evalValue += countPoints(numberCount, player, opponent);
-    }
-
-    //iterate through columns
-    for (var i = 0; i < 3; i++) {
-        numberCount = [0, 0, 0];
-        // iterate through elements in column
-        for (var j = 0; j < 3; j++) {
-            //  count number of 0s players and opponents in row
-            numberCount[selected[outerX][outerY][j][i]]++;
-        }
-        evalValue += countPoints(numberCount, player, opponent);
-    }
-
-    //check diagonal 1
-    numberCount = [0, 0, 0];
-    for (var i = 0; i < 3; i++) {
-        //iterate through elements in diagonal
-        numberCount[selected[outerX][outerY][i][i]]++;
-    }
-    evalValue += countPoints(numberCount, player, opponent);
-
-    //check diagonal 2
-    numberCount = [0, 0, 0];
-    for (var i = 0; i < 3; i++) {
-        //iterate through elements in diagonal
-        numberCount[selected[outerX][outerY][2 - i][i]]++;
-    }
-    evalValue += countPoints(numberCount, player, opponent);
-    //prompt(evalValue);
-    return evalValue;
-}
-
-function countPoints(numberCount, player, opponent) {
-
-	var points = 0;
-
-	
-	//if player count = 3 then win
-	if (numberCount[player] === 3)
-		return 30;
-
-	//if opponent count = 3 then win
-	if (numberCount[opponent] === 3)
-		return -30;
-	
-	
-	//  if opponent count = 0 and 0 count > 0 and player count > 0 then winnable
-	if (numberCount[opponent] === 0 && numberCount[0] > 0 && numberCount[player] > 0)
-		points += 1;
-		
-	//  if player count = 0 and 0 count > 0 and opponent count > 0 then winnable
-	if (numberCount[player] === 0 && numberCount[0] > 0 && numberCount[opponent] > 0)
-		points -= 1;
-
-	//if opponent count = 2 and player count = 1 then blocked win
-	if (numberCount[opponent] === 2 && numberCount[player] === 1)
-		points += 5;
-		
-	//if player count = 2 and opponent count = 1 then blocked win
-	if (numberCount[player] === 2 && numberCount[opponent] === 1)
-		points -= 5;
-
-	//if player count = 2 and 0 count = 1 then setting up for win
-	if (numberCount[player] === 2 && numberCount[0] === 1)
-		points += 10;
-		
-	//if opponent gets 2 in a row
-	if (numberCount[opponent] === 2 && numberCount[0] === 1)
-		points -= 10;
-
-	
-	
-	
-    return points;
-}
-
-//add in negatives to this
-function countPointsBigBoard(numberCount, player, opponent) {
-    
-	var points = 0;
-	
-
-	//if player count = 3 then win
-	if (numberCount[player] === 3)
-		return 100;
-		
-	//if opponent count = 3 then win
-	if (numberCount[opponent] === 3)
-		return -100;
-	
-	/*
-	//  if opponent count = 0 and 0 count > 0 and player count > 0 then winnable
-	if (numberCount[opponent] === 0 && numberCount[0] > 0 && numberCount[player] > 0)
-		points += 5;
-		
-	//  if player count = 0 and 0 count > 0 and opponent count > 0 then winnable
-	if (numberCount[player] === 0 && numberCount[0] > 0 && numberCount[opponent] > 0)
-		points -= 5;
-	*/
-	
-	//if opponent count = 2 and player count = 1 then blocked win
-	if (numberCount[opponent] === 2 && numberCount[player] === 1)
-		points += 20;
-		
-	//if player count = 2 and opponent count = 1 then blocked win
-	if (numberCount[player] === 2 && numberCount[opponent] === 1)
-		points -= 20;
-
-	//if player count = 2 and 0 count = 1 then setting up for win
-	if (numberCount[player] === 2 && numberCount[0] === 1)
-		points += 20;
-		
-	//if opponent count = 2 and 0 count = 1 then setting up for win
-	if (numberCount[opponent] === 2 && numberCount[0] === 1)
-		points -= 20;
-
-	
-		
-    return points;
-}
-
-//evaluates the state of the game.
-//will return a point value based on the player who is at the end of the sequence of moves
-//points are added up if grid states have favourable attributes that are in a row
+The board state is examined to see how many of these attributes each player has
+Then the points are added up based on the weight of each of the attributes
+It then returns the number of points to be used in the move decision.
+*/
 function evaluateBoardState(player)
 {
-	//this will be 1 or -1 depending on which player the board is being evaluated for
-	//var modifier = (player === 1) ? 1: -1;
 	var modifier = 1;
 
 	//points that will be passed up to the min-max function
@@ -286,16 +118,9 @@ function evaluateBoardState(player)
 		for(var j = 0; j <= 2; j++)
 		{
 			gridStates[i][j] = evaluateSmallGrid(i, j, player);
-			
-			
-	//		alert(gridStates[i][j].wonPOne + "\n" + gridStates[i][j].wonPTwo + "\n" + gridStates[i][j].numTwosPOne + "\n" + gridStates[i][j].numTwosPTwo 
-		//		+ "\n" + gridStates[i][j].winnableRowsPOne + "\n" + gridStates[i][j].winnableRowsPTwo + "\n" + gridStates[i][j].blockedWinsPOne + "\n" + gridStates[i][j].blockedWinsPTwo);
 		}
 	}
-	
-	
-	
-	
+
 	//variables to hold temporary values of number of wins / number of "2 in a rows" etc
 	var wonRowsPOne = 0;
 	var wonRowsPTwo = 0;
@@ -337,7 +162,7 @@ function evaluateBoardState(player)
         }
 			
 			
-		//if game is winnable jack up the points
+		//if game is winnable increase the points
 		if(wonRowsPOne === 3)
 			wonRowsPOne = 100;
 		if(wonRowsPTwo === 3)
@@ -515,7 +340,14 @@ function evaluateBoardState(player)
 }//end evaluateBoardState
 
 
+/*Checks for attributes of the game state, like:
+	2 in a rows
+	blocked 3 in a rows
+	winnable rows
 
+saves all the attributed in objects for each player
+to be added up for points later
+*/
 function checkGridState(numberCount, gridState)
 {
 	//if player count = 3 then win
@@ -554,10 +386,21 @@ function checkGridState(numberCount, gridState)
 
 }
 
+/*
+Evaluates the state of the small grid.
 
-//This function will evaluate a small grid of the board and populate an object based on the situation of that board
-//it will then return the object to the calling function.
-//it is up to another function to use the information of the gridStates to determine the state of the game
+will return a point value based on the player who is at the end of the sequence of moves
+points are added up if grid states have favourable attributes that are in a row
+
+different board states are valued positively and negatively with different weights
+	2-in a rows
+	winnable rows
+	blocked rows
+
+The board state is examined to see how many of these attributes each player has
+Then the points are added up based on the weight of each of the attributes
+It then returns the number of points to be used in the move decision.
+*/
 function evaluateSmallGrid(outerX, outerY, player)
 {
 	var opponent = (player === 1) ? 2 : 1;
@@ -742,40 +585,10 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
     if (plyCount === 0) {
         //swap player
         player = (player === 1) ? 2 : 1;
-		
-		//OLD CODE
-		/*
-        for (var i = 0; i < 3; i++)
-            for (var j = 0; j < 3; j++)
-                state.value += evalState(i, j, player);
-        
-		
-		var tempVal = state.value;
-		
-		state.value += evalGame(player);
-		
-		prompt("value of the small board state: " + tempVal + "\nadded value of the big board state: " + state.value);
-		
-		*/
-		
 		state.value = evaluateBoardState(player);
-		
-		/*
-		var wonCellsString = "";
-		for(var i = 0; i < 3; i++)
-			for(var j = 0; j < 3; j++)
-				wonCellsString += ("["+ i + "]" + "[" + j + "]" + ": " + wonCells[i][j] + "\n");
-		
-		//alert(wonCellsString);
-		*/
-		//alert(state.value);
-        
+
 		return state;
     }
-
-    //change outer x to previous inner x
-    //state.outerX = innerX;
-    //state.outerY = innerY;
 
     //if cell is won then consider whole board
     if (wonCells[innerX][innerY])
@@ -793,22 +606,11 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
                             selected[i][j][k][l] = player;
 							wonCells[i][j] = checkForBoardWin(i, j, player);
                             mark(i, j, k, l, player, 0.7);
-							
-							//Old code
-							/*
-							//calculate next move normally
-							var newState = calculateMove(i, j, k, l, plyCount - 1, (player === 1) ? 2 : 1);
-							newState.outerX = i;
-							newState.outerY = j;
-							newState.innerX = k;
-							newState.innerY = l;
-							*/
-							
-						
+
 							//if this move resulted in a win or draw, stop branching and evaluate here
 							if(checkForGameWin(player) != 0)
 							{
-								alert("board state winnable by player: " + player);
+								//alert("board state winnable by player: " + player);
 						
 								var newState = {
 									value: -1,
@@ -830,15 +632,7 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 					
 								//newState.value = evaluateBoardState((player === 1) ? 2 : 1);
 								newState.value = evaluateBoardState(tempPlayer);
-								
-								
-								alert("Board state winnable by player: "+ player + "\nvalue = " + newState.value);
-						
-		
-								//alert(state.value);
-		
-								//alert(state.value);
-								
+	
 								debugging = 1;
 								
 								selected[i][j][k][l] = 0;
@@ -856,9 +650,6 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 								newState.innerY = l;
 							}
 							
-
-                            
-
                             //based on level in tree, get min or max
                             if (plyCount % 2 === 1)
                                 state = getMax(state, newState);
@@ -888,22 +679,10 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 					
 					wonCells[innerX][innerY] = checkForBoardWin(innerX, innerY, player);
                     mark(innerX, innerY, i, j, player, 0.7);
-					
-					/*
-					var newState = calculateMove(innerX, innerY, i, j, plyCount - 1, (player === 1) ? 2 : 1);
-					newState.outerX = innerX;
-					newState.outerY = innerY;
-					newState.innerX = i;
-					newState.innerY = j;
-					*/
-					
-					
+
                     if(checkForGameWin(player) != 0)
 					{
-						
-						alert("board state winnable by player: " + player);
-						//stop branching and evaluate the state here by calculating move with plyCount = 0
-					
+						//stop branching and evaluate the state here by calculating move with plyCount = 0	
 						var newState = {
 							value: -1,
 							outerX: innerX,
@@ -924,8 +703,6 @@ function calculateMove(outerX, outerY, innerX, innerY, plyCount, player) {
 						//newState.value = evaluateBoardState((player === 1) ? 2 : 1);
 						newState.value = evaluateBoardState(tempPlayer);
 
-						alert("Board state winnable by player: "+ player + "\nvalue = " + newState.value);
-						
 						debugging = 1;
 						
 						selected[innerX][innerY][i][j] = 0;
